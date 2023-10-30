@@ -1,0 +1,6 @@
+li {
+    list-style-type: none;
+}
+.crossed-out {
+    text-decoration: line-through;
+}
