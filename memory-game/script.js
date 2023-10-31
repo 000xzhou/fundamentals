@@ -58,10 +58,39 @@ function createDivsForColors(colorArray) {
 }
 
 // TODO: Implement this function!
+let clickCount = 0
+const timeoutDuration = 1000
+
 function handleCardClick(event) {
   // you can use event.target to see which element was clicked
-  console.log("you just clicked", event.target);
+  // console.log("you just clicked", event.target);
+  //check how many clicks?
+  if (clickCount < 2) {
+    clickCount++;
+    changeBgColor(event)
+  }
+  if (clickCount === 2) {
+    // Disable the button to prevent further clicks
+    gameContainer.disabled = true
+  }
+  
   //setTimeout
+  clearTimeout(timeoutId);
+  timeoutId = setTimeout(resetClickCount, timeoutDuration)
+}
+
+let timeoutId
+function resetClickCount() {
+  const bgColor = document.querySelectorAll("#game div")
+  console.log(bgColor)
+  clickCount = 0
+  gameContainer.disabled = false
+  // ! problem with this... is that it selects all of them... not only the 2 freshly selected ones
+  // ! maybe i need to put them in an array..
+  // ! one for matched already and one for currently matching
+  bgColor.forEach(div => div.style.background = "")
+}
+function changeBgColor(event) {
   let color = event.target.getAttribute("class")
   event.target.style.background = color
 }
