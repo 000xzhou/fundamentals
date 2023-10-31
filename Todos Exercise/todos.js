@@ -14,7 +14,7 @@ function addTodo() {
     checkbox.id = `item_${idCounter}`
     // listItem.textContent = memo.value
     label.setAttribute("for", checkbox.id)
-    label.textContent = memo.value
+    label.textContent = " " +memo.value
 
     // checkbox.textContent = memo.value
     listItem.appendChild(checkbox)
@@ -54,11 +54,71 @@ function deleteTodo() {
     todoList.innerHTML = ""
 }
 
-// save to localStorage
 submit.addEventListener("click", (e)=> {
     e.preventDefault()
     addTodo()
+    savetoLocal()
+
 })
-todoList.addEventListener("change", completeTodo)
-deleteComplete.addEventListener("click", deleteCompleteTodo)
-deletetodoList.addEventListener("click", deleteTodo)
+todoList.addEventListener("change", ()=> {
+    completeTodo()
+    savetoLocal()
+
+})
+
+deleteComplete.addEventListener("click", ()=> {
+    deleteCompleteTodo()
+    savetoLocal()
+})
+deletetodoList.addEventListener("click", () =>{
+    deleteTodo()
+    savetoLocal()
+})
+
+
+// save to local
+function savetoLocal() {
+    const listData = []
+    const listItemsWithCheckboxes = document.querySelectorAll('ul li')
+    listItemsWithCheckboxes.forEach(function(item) {
+    let text = item.textContent.trim() // Get the text content
+    let isChecked = item.querySelector('input[type="checkbox"]').checked // Check if the checkbox is checked 
+    listData.push({ text, isChecked })
+    })
+    localStorage.setItem('myListData', JSON.stringify(listData))
+}
+
+
+function loadSaveLocal() {
+    const storedListDataJSON = localStorage.getItem('myListData')
+    todoList.innerHTML = ''
+    if (storedListDataJSON) {
+        let listDatatwo = JSON.parse(storedListDataJSON)
+        listDatatwo.forEach((itemData)=> {
+            addTodo2(itemData)
+        })
+    }
+}
+
+function addTodo2(memo2) {
+    const listItem = document.createElement("li")
+    const checkbox = document.createElement("input")
+    const label = document.createElement("label")
+    checkbox.setAttribute("type", "checkbox")
+    checkbox.id = `item_${idCounter}`
+    label.textContent = " " + memo2.text
+    label.setAttribute("for", checkbox.id)
+            checkbox.checked = memo2.isChecked
+    if(checkbox.checked) {
+                label.classList.add("crossed-out")
+            } else {
+                label.classList.remove("crossed-out")
+            }
+    listItem.appendChild(checkbox)
+    listItem.appendChild(label)
+    todoList.appendChild(listItem)
+    idCounter++
+    memo2.value = ""
+}
+
+loadSaveLocal()
