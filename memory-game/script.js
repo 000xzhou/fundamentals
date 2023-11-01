@@ -42,12 +42,14 @@ let shuffledColors = shuffle(COLORS);
 // it creates a new div and gives it a class with the value of the color
 // it also adds an event listener for a click for each card
 function createDivsForColors(colorArray) {
-  for (let color of colorArray) {
+  // for (let color of colorArray) {
+    for(let i=0; i< colorArray.length; i++) {
     // create a new div
     const newDiv = document.createElement("div");
 
     // give it a class attribute for the value we are looping over
-    newDiv.classList.add(color);
+    newDiv.classList.add(colorArray[i]);
+    newDiv.setAttribute('data-itemNum', `item_${i+1}`)
 
     // call a function handleCardClick when a div is clicked on
     newDiv.addEventListener("click", handleCardClick);
@@ -60,39 +62,52 @@ function createDivsForColors(colorArray) {
 // TODO: Implement this function!
 let clickCount = 0
 const timeoutDuration = 1000
+const matched = []
+let matching = []
+let firstClick = true;
+let previousTarget = null;
 
 function handleCardClick(event) {
-  // you can use event.target to see which element was clicked
-  // console.log("you just clicked", event.target);
-  //check how many clicks?
-  if (clickCount < 2) {
-    clickCount++;
+
+  if (firstClick) {
+    // This is the first click
+    firstClick = false;
+    previousTarget = event.target;
+    matching.push(event.target)
     changeBgColor(event)
+  } else {
+    // This is the second click
+    // secondBox = event.target
+    if (event.target === previousTarget) {
+      console.log("you can't pick the same square")
+    } else {
+      matching.push(event.target)
+      changeBgColor(event)
+      // checkifMatched()
+      console.log(checkifMatched())
+    }
+    firstClick = true; // Reset for the next comparison
   }
-  if (clickCount === 2) {
-    // Disable the button to prevent further clicks
-    gameContainer.disabled = true
-  }
-  
-  //setTimeout
-  clearTimeout(timeoutId);
-  timeoutId = setTimeout(resetClickCount, timeoutDuration)
 }
 
 let timeoutId
 function resetClickCount() {
-  const bgColor = document.querySelectorAll("#game div")
-  console.log(bgColor)
-  clickCount = 0
-  gameContainer.disabled = false
-  // ! problem with this... is that it selects all of them... not only the 2 freshly selected ones
-  // ! maybe i need to put them in an array..
-  // ! one for matched already and one for currently matching
-  bgColor.forEach(div => div.style.background = "")
+
 }
 function changeBgColor(event) {
   let color = event.target.getAttribute("class")
   event.target.style.background = color
+}
+
+function checkifMatched() {
+  if(matching[0].className === matching[1].className) {
+    matched.push(matching)
+    matching = []
+    return "match"
+  } else {
+    matching = []
+    return "don't match"
+  }
 }
 
 // when the DOM loads
