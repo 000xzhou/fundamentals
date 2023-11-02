@@ -45,70 +45,176 @@ function createDivsForColors(colorArray) {
   // for (let color of colorArray) {
     for(let i=0; i< colorArray.length; i++) {
     // create a new div
-    const newDiv = document.createElement("div");
-
+    const card = document.createElement("div");
+    const cardInner = document.createElement("div");
+    const cardFront = document.createElement("div");
+    const cardBack = document.createElement("div");
     // give it a class attribute for the value we are looping over
-    newDiv.classList.add(colorArray[i]);
-    newDiv.setAttribute('data-itemNum', `item_${i+1}`)
+    card.classList.add(colorArray[i]);
+    cardFront.setAttribute('data-id', `item_${i+1}`)
+    cardFront.setAttribute('data-color', colorArray[i])
+    cardBack.setAttribute('data-color', colorArray[i])
+    card.setAttribute("class", "flip-card")
 
     // call a function handleCardClick when a div is clicked on
-    newDiv.addEventListener("click", handleCardClick);
+    card.addEventListener("click", handleCardClick);
 
+    cardInner.setAttribute("class", "inner")
+    cardFront.setAttribute("class", "front")
+    cardBack.setAttribute("class", "back")
+    cardBack.style.background = colorArray[i]
+    
     // append the div to the element with an id of game
-    gameContainer.append(newDiv);
+    gameContainer.append(card);
+    card.append(cardInner);
+    cardInner.append(cardFront);
+    cardInner.append(cardBack);
   }
 }
 
 // TODO: Implement this function!
 let clickCount = 0
 const timeoutDuration = 1000
-const matched = []
+let matched = []
 let matching = []
-let firstClick = true;
 let previousTarget = null;
 
 function handleCardClick(event) {
 
-  if (firstClick) {
-    // This is the first click
-    firstClick = false;
-    previousTarget = event.target;
-    matching.push(event.target)
-    changeBgColor(event)
-  } else {
+  if (matching.length == 0) {
+    // check if it been match already
+    // console.log(matched.includes(event.target.previousElementSibling))
+    if(matched.includes(event.target.getAttribute("data-color"))){
+      return
+    }
+
+      previousTarget = event.target
+      // console.log(event.target)
+      matching.push(event.target)
+      // event.target.classList.add("flip")
+      event.target.parentElement.classList.add("flip")
+      event.target.parentElement.parentElement.classList.add("flip")
+      // changeBgColor(event)
+  } else if (matching.length == 1){
     // This is the second click
-    // secondBox = event.target
+    // console.log("checking " + event.target.getAttribute("data-color"))
+    // console.log(matched.includes(event.target.getAttribute("data-color")))
+    if(matched.includes(event.target.getAttribute("data-color"))){
+      return
+    }
     if (event.target === previousTarget) {
       console.log("you can't pick the same square")
     } else {
       matching.push(event.target)
-      changeBgColor(event)
-      // checkifMatched()
-      console.log(checkifMatched())
+      event.target.parentElement.classList.add("flip")
+      event.target.parentElement.parentElement.classList.add("flip")
+      // changeBgColor(event)
+      // disable clicking
+      // console.log(matching[1])
+
+      checkifMatched()
+      
+      //enable clicking
+      // setTimeout(()=> {
+      //   gameContainer.disabled = false
+      // }, 1000)
+      // new Promise(resolve => setTimeout(resolve, 1000));
     }
     firstClick = true; // Reset for the next comparison
   }
 }
 
-let timeoutId
-function resetClickCount() {
-
-}
-function changeBgColor(event) {
-  let color = event.target.getAttribute("class")
-  event.target.style.background = color
-}
+// function changeBgColor(event) {
+//   let color = event.target.getAttribute("class")
+//   event.target.classList.add("flip")
+// }
 
 function checkifMatched() {
-  if(matching[0].className === matching[1].className) {
-    matched.push(matching)
+  if(matching[0].getAttribute("data-color")=== matching[1].getAttribute("data-color")) {
+    matched.push(matching[0].getAttribute("data-color"))
+    // keeps card face up
     matching = []
+    if(isGameComplete()) {
+      //display message
+      displayMessage()
+    }
     return "match"
   } else {
-    matching = []
+    // keep face down
+    setTimeout(() => {
+      // matching[0].style.background = ""
+      // matching[1].style.background = ""
+      // console.log(matching[0].parentElement)
+      matching[0].parentElement.classList.remove("flip")
+      matching[0].parentElement.parentElement.classList.remove("flip")
+      matching[1].parentElement.classList.remove("flip")
+      matching[1].parentElement.parentElement.classList.remove("flip")
+      // resetCards();
+      matching = []
+    }, 1000)
     return "don't match"
   }
 }
+function startGame() {
+  let shuffledColors2 = shuffle(COLORS)
+  gameContainer.innerHTML = ""
+  matching = []
+  matched = []
+  createDivsForColors(shuffledColors2);
+}
 
+function displayMessage() { 
+  let message = document.createElement("div")
+  message.textContent = "congrates! you beat the game. Click this box to start new game"
+  message.classList.add("message")
+  document.body.appendChild(message)
+  message.addEventListener("click", () => {
+    endGame()
+    startGame()
+  })
+}
+
+function isGameComplete() {
+  // 
+  // console.log(matched)
+  return COLORS.length/2 == matched.length 
+  && COLORS.every((value) => matched.includes(value))
+}
+
+function endGame() {
+  const existingElement = document.querySelector(".message")
+  if (existingElement) {
+  existingElement.remove()
+}
+}
 // when the DOM loads
-createDivsForColors(shuffledColors);
+// createDivsForColors(shuffledColors);
+
+const btn = document.querySelector("button")
+btn.addEventListener("click", startGame)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// function arraysEqual(arr1, arr2) {
+//   return arr1.every((value) => arr2.includes(value));
+// }
+// console.log(arraysEqual(["red","green"], ["red"]))
+// console.log(arraysEqual(["red","green"], ["red","green"]))
+// console.log(arraysEqual(["red","red", "green", "green"], ["red","green"]))
+// console.log(arraysEqual(["red","green"], ["red","red", "green", "green"]))
+
+
+
