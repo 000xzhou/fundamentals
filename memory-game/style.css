@@ -75,3 +75,21 @@ button:hover {
   width: 400px;
   height: 200px;
 }
+.messageBox {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.messageBox div {
+  padding: 1rem;
+}
+
+h1 {
+  display: flex;
+  align-items: center; 
+}
+
+h2 {
+  padding-left: 1rem;
+}

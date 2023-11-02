@@ -70,6 +70,7 @@ function createDivsForColors(colorArray) {
     cardInner.append(cardFront);
     cardInner.append(cardBack);
   }
+  createClickCount()
 }
 
 // TODO: Implement this function!
@@ -80,7 +81,6 @@ let matching = []
 let previousTarget = null;
 
 function handleCardClick(event) {
-
   if (matching.length == 0) {
     // check if it been match already
     // console.log(matched.includes(event.target.previousElementSibling))
@@ -91,6 +91,9 @@ function handleCardClick(event) {
       previousTarget = event.target
       // console.log(event.target)
       matching.push(event.target)
+      // clickCount++
+      clickCount++
+    document.querySelector("h2").textContent = clickCount
       // event.target.classList.add("flip")
       event.target.parentElement.classList.add("flip")
       event.target.parentElement.parentElement.classList.add("flip")
@@ -106,14 +109,15 @@ function handleCardClick(event) {
       console.log("you can't pick the same square")
     } else {
       matching.push(event.target)
+      // clickCount++
+      clickCount++
+    document.querySelector("h2").textContent = clickCount
       event.target.parentElement.classList.add("flip")
       event.target.parentElement.parentElement.classList.add("flip")
       // changeBgColor(event)
       // disable clicking
       // console.log(matching[1])
-
       checkifMatched()
-      
       //enable clicking
       // setTimeout(()=> {
       //   gameContainer.disabled = false
@@ -160,13 +164,26 @@ function startGame() {
   gameContainer.innerHTML = ""
   matching = []
   matched = []
+  clickCount = 0
+  document.querySelector("h2").remove()
   createDivsForColors(shuffledColors2);
 }
 
 function displayMessage() { 
   let message = document.createElement("div")
-  message.textContent = "congrates! you beat the game. Click this box to start new game"
+  let messageBox = document.createElement("div")
+  let one = document.createElement("div")
+  let two = document.createElement("div")
+  let three = document.createElement("div")
+  one.textContent = `Congrates! you beat the game.`
+  two.textContent = `Click this box to a start new game.`
+  three.textContent = `\nTotal click Count: ${clickCount}`
   message.classList.add("message")
+  messageBox.classList.add("messageBox")
+  messageBox.append(one)
+  messageBox.append(two)
+  messageBox.append(three)
+  message.append(messageBox)
   document.body.appendChild(message)
   message.addEventListener("click", () => {
     endGame()
@@ -185,10 +202,19 @@ function endGame() {
   const existingElement = document.querySelector(".message")
   if (existingElement) {
   existingElement.remove()
+  }
 }
+
+function createClickCount() {
+  const h1 = document.querySelector("h1")
+  const clickHeading = document.createElement("h2")
+  clickHeading.classList.add = "clickCount"
+  h1.appendChild(clickHeading)
+  clickHeading.textContent = clickCount
 }
+
 // when the DOM loads
-// createDivsForColors(shuffledColors);
+createDivsForColors(shuffledColors);
 
 const btn = document.querySelector("button")
 btn.addEventListener("click", startGame)
